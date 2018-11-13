@@ -165,9 +165,8 @@ architecture.
 
 # Contact (Bugs, Feedback, Contribution and more)
 
-For questions about *deep-eos*, contact the current maintainer: Stefan
-Schweter <stefan@schweter.it>. If you want to contribute to the project
-please refer to the [Contributing](CONTRIBUTING.md) guide!
+For questions about *deep-eos*, just open an issue [here](https://github.com/stefan-it/deep_eos/issues).
+A contribution is coming soon!
 
 # License
 
