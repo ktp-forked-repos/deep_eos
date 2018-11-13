@@ -8,8 +8,8 @@ import toml
 
 from deep_eos.data import Corpus, Context
 from deep_eos.data_fetcher import EOSContextFetcher, Task
-from deep_eos.models.deep_eos_lstm_model import DEEPEOS
-from deep_eos.trainers.deep_eos_trainer import DEOSTrainer
+from deep_eos.models.deep_eos_lstm_model import DeepEos
+from deep_eos.trainers.deep_eos_trainer import DeepEosTrainer
 
 
 def training(configuration: dict):  # pylint: disable=too-many-locals
@@ -59,11 +59,11 @@ def training(configuration: dict):  # pylint: disable=too-many-locals
     learning_rate: float = configuration['training']['learning_rate']
     model_file: Path = Path(configuration['training']['model_file'])
 
-    deep_eos: DEEPEOS = DEEPEOS(vocab=vocab, label_vocab=label_vocab, batch_size=batch_size,
+    deep_eos: DeepEos = DeepEos(vocab=vocab, label_vocab=label_vocab, batch_size=batch_size,
                                 hidden_size=hidden_size, embedding_length=embedding_size,
                                 output_size=output_size)
 
-    trainer: DEOSTrainer = DEOSTrainer(model=deep_eos, corpus=corpus)
+    trainer: DeepEosTrainer = DeepEosTrainer(model=deep_eos, corpus=corpus)
 
     trainer.train(model_file=model_file, learning_rate=learning_rate, batch_size=batch_size,
                   epochs=epochs)

@@ -16,7 +16,7 @@ from deep_eos.utils import get_char_context
 LOG = logging.getLogger(__name__)
 
 
-class DEEPEOS(torch.nn.Module):  # pylint: disable=too-many-instance-attributes
+class DeepEos(torch.nn.Module):  # pylint: disable=too-many-instance-attributes
     """Implement deep eos model using LSTM."""
 
     def __init__(self,  # pylint: disable=too-many-arguments
@@ -27,7 +27,7 @@ class DEEPEOS(torch.nn.Module):  # pylint: disable=too-many-instance-attributes
                  embedding_length: int = 256,
                  output_size: int = 2,
                  use_dropout: float = 0.0):
-        """Define constructor for DEEPEOS class.
+        """Define constructor for DeepEos class.
 
         :param vocab: vocabulary
         :param label_vocab: vocabulary for labels
@@ -37,7 +37,7 @@ class DEEPEOS(torch.nn.Module):  # pylint: disable=too-many-instance-attributes
         :param output_size: output size (normally 2: EOS and NON-EOS)
         :param use_dropout: define dropout
         """
-        super(DEEPEOS, self).__init__()
+        super(DeepEos, self).__init__()
 
         self.vocab = vocab
         self.label_vocab = label_vocab
@@ -85,7 +85,7 @@ class DEEPEOS(torch.nn.Module):  # pylint: disable=too-many-instance-attributes
         use_dropout = 0.0 if 'use_dropout' not in state.keys() \
             else state['use_dropout']
 
-        model = DEEPEOS(vocab=state['vocab'],
+        model = DeepEos(vocab=state['vocab'],
                         label_vocab=state['label_vocab'],
                         batch_size=state['batch_size'],
                         hidden_size=state['hidden_size'],

@@ -10,15 +10,15 @@ import torch.nn.functional as F  # pylint: disable=import-error,no-name-in-modul
 from torch.autograd import Variable
 
 from deep_eos.data import Corpus, Context
-from deep_eos.models.deep_eos_lstm_model import DEEPEOS
+from deep_eos.models.deep_eos_lstm_model import DeepEos
 
 LOG = logging.getLogger(__name__)
 
 
-class DEOSTrainer:
+class DeepEosTrainer:
     """Implement deep_eos trainer class."""
 
-    def __init__(self, model: DEEPEOS, corpus: Corpus):
+    def __init__(self, model: DeepEos, corpus: Corpus):
         """Define eos trainer class constructor.
 
         :param model: deep_eos model

@@ -1,1 +1,1 @@
-from .deep_eos_trainer import DEOSTrainer
+from .deep_eos_trainer import DeepEosTrainer

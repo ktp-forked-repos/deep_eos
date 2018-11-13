@@ -6,7 +6,7 @@ from pathlib import Path
 import click
 import toml
 
-from deep_eos.models.deep_eos_lstm_model import DEEPEOS
+from deep_eos.models.deep_eos_lstm_model import DeepEos
 from deep_eos.utils import parse_dataset_to_buffer, parse_file_to_buffer
 
 # Info logs can confuse evaluation later, so only display warnings
@@ -24,7 +24,7 @@ def prediction(configuration: dict):
     right_ws = configuration['deep_eos']['right_ws']
     eos_marker = configuration['prediction']['eos_marker']
 
-    deep_eos: DEEPEOS = DEEPEOS.load_from_file(model_file)
+    deep_eos: DeepEos = DeepEos.load_from_file(model_file)
 
     for dataset in ['dev_path', 'test_path']:
         dataset_file = Path(configuration[task_name][dataset])
