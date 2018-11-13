@@ -1,10 +1,14 @@
 """Implement various helper functions."""
 
+from collections import namedtuple
+from typing import Set
+
 from deep_eos.data import Context
 
 EOS_CHARS = ['.', ';', '!', '?', ':']
 EOS_MARKER = '</eos>'
 SEPS = [' ', '\n']
+EvaluationResult = namedtuple("EvaluationResult", 'precision, recall, f_score')
 
 
 def get_char_context(left_window, right_window, buffer):
@@ -65,3 +69,23 @@ def parse_file_to_buffer(filename):
     """
     with open(filename, 'rt') as f_p:
         return "\n".join(f_p.readlines())
+
+
+def calculate_evaluation_metrics(gold_positions: Set[int], predicted_positions: Set[int]) \
+        -> EvaluationResult:
+    """Calculate evaluation metrics (precision, recall and f-score).
+
+    :param gold_positions: set of gold eos positions
+    :param predicted_positions: set of predicted eos positions
+    :return: precision, recall and f_score as evaluation result (namedtuple)
+    """
+    true_positives = len(predicted_positions.intersection(gold_positions))
+    false_positives = len(predicted_positions.difference(gold_positions))
+    false_negatives = len(gold_positions.difference(predicted_positions))
+
+    precision = true_positives / (true_positives + false_positives)
+    recall = true_positives / (true_positives + false_negatives)
+
+    f_score = 2 * (precision * recall) / (precision + recall)
+
+    return EvaluationResult(precision=precision, recall=recall, f_score=f_score)
