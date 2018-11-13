@@ -1,5 +1,8 @@
 # *DEEP-EOS*: Deep end-of-sentence boundary detection
 
+[![GitHub Issues](https://img.shields.io/github/issues/stefan-it/deep_eos.svg)](https://github.com/stefan-it/deep_eos/issues)
+[![Travis](https://img.shields.io/travis/stefan-it/deep_eos.svg)](https://travis-ci.org/stefan-it/deep_eos)
+
 In this repository we present a network models for sentence
 boundary detection. This repository superseeds the [old implementation](https://github.com/stefan-it/deep-eos).
 
