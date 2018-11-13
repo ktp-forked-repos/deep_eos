@@ -1,5 +1,6 @@
 # *DEEP-EOS*: Deep end-of-sentence boundary detection
 
+[![PyPI version](https://badge.fury.io/py/deep-eos.svg)](https://badge.fury.io/py/deep-eos)
 [![GitHub Issues](https://img.shields.io/github/issues/stefan-it/deep_eos.svg)](https://github.com/stefan-it/deep_eos/issues)
 [![Travis](https://img.shields.io/travis/stefan-it/deep_eos.svg)](https://travis-ci.org/stefan-it/deep_eos)
 
