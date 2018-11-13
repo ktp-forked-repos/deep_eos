@@ -6,7 +6,8 @@ from typing import Set
 import click
 import toml
 
-from deep_eos.utils import parse_dataset_to_buffer, parse_file_to_buffer
+from deep_eos.utils import parse_dataset_to_buffer, parse_file_to_buffer, \
+    calculate_evaluation_metrics, EvaluationResult
 
 
 def retrieve_eos_positions(buffer: str, eos_marker: str):
@@ -23,25 +24,6 @@ def retrieve_eos_positions(buffer: str, eos_marker: str):
             yield tok_idx
         else:
             tok_idx += len(token)
-
-
-def calculate_metrix(gold_positions: Set[int], predicted_positions: Set[int]):
-    """Calculate evaluation matrix (precision, recall and f-score).
-
-    :param gold_positions: set of gold eos positions
-    :param predicted_positions: set of predicted eos positions
-    :return:
-    """
-    true_positives = len(predicted_positions.intersection(gold_positions))
-    false_positives = len(predicted_positions.difference(gold_positions))
-    false_negatives = len(gold_positions.difference(predicted_positions))
-
-    precision = true_positives / (true_positives + false_positives)
-    recall = true_positives / (true_positives + false_negatives)
-
-    f_score = 2 * (precision * recall) / (precision + recall)
-
-    return precision, recall, f_score
 
 
 def evaluation(configuration: dict):
@@ -81,11 +63,11 @@ def evaluation(configuration: dict):
         gold_eos_positions: Set[int] = set(retrieve_eos_positions(buffer=gold_buffer,
                                                                   eos_marker=eos_marker))
 
-        precision, recall, f_score = calculate_metrix(gold_eos_positions,
-                                                      predicted_eos_positions)
+        result: EvaluationResult = calculate_evaluation_metrics(gold_eos_positions,
+                                                                predicted_eos_positions)
 
         print(f'Evaluation on {dataset.replace("_", " ")}')
-        print(f'Precision: {precision}, Recall: {recall}, F-Score: {f_score}')
+        print(f'Precision: {result.precision}, Recall: {result.recall}, F-Score: {result.f_score}')
         print('')
 
 
