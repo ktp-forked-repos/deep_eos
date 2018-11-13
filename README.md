@@ -1,7 +1,7 @@
 # *DEEP-EOS*: Deep end-of-sentence boundary detection
 
 In this repository we present a network models for sentence
-boundary detection.
+boundary detection. This repository superseeds the [old implementation](https://github.com/stefan-it/deep-eos).
 
 ## Introduction
 
