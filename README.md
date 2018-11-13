@@ -79,9 +79,10 @@ tar -xzf ud-treebanks-v2.2.tgz
 
 # Configuration
 
-*deep-eos* uses a configuration-based training, prediction and evaluation. That means, all parameters
-are specified in a *toml* configuration file. This heavily reduces the amount of commandline
-arguments. The only commandline option is the path to the *toml* configuration file.
+*deep-eos* uses a configuration-based commandline interface for training, prediction and evaluation. 
+That means, all parameters are specified in a *toml* configuration file. This heavily reduces the 
+amount of commandline arguments. The only commandline option is the path to the *toml* configuration
+file.
 
 ## *toml* configuration
 
