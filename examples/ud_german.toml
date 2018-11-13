@@ -1,0 +1,24 @@
+[ud]
+train_path = "../ud-treebanks-v2.2/UD_German-GSD/de_gsd-ud-train.conllu"
+dev_path = "../ud-treebanks-v2.2/UD_German-GSD/de_gsd-ud-dev.conllu"
+test_path = "../ud-treebanks-v2.2/UD_German-GSD/de_gsd-ud-test.conllu"
+
+[lstm]
+embedding_size = 256
+hidden_size = 128
+output_size = 2
+
+[training]
+batch_size = 32
+epochs = 20
+model_file = "./best_ud_german_model.pt"
+learning_rate = 0.001
+
+[deep_eos]
+left_ws = 4
+right_ws = 4
+
+[prediction]
+dev_tagged_file = "ud_german_dev_tagged.txt"
+test_tagged_file = "ud_german_test_tagged.txt"
+eos_marker = "</eos>"
