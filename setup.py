@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='deep-eos',
-    version='0.0.2',
+    version='0.0.2.post1',
     description='Deep end-of-sentence detection',
     long_description=open("README.md", encoding='utf-8').read(),
     long_description_content_type="text/markdown",
