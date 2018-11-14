@@ -10,6 +10,7 @@ import torch
 from torch.autograd import Variable
 from torchtext.vocab import Vocab
 
+from deep_eos.dropout import CharacterDropout, LockedDropout
 from deep_eos.utils import EOS_CHARS
 from deep_eos.utils import get_char_context
 
@@ -26,7 +27,9 @@ class DeepEos(torch.nn.Module):  # pylint: disable=too-many-instance-attributes
                  hidden_size: int = 256,
                  embedding_length: int = 256,
                  output_size: int = 2,
-                 use_dropout: float = 0.0):
+                 use_dropout: float = 0.0,
+                 use_word_dropout: float = 0.05,
+                 use_locked_dropout: float = 0.5):
         """Define constructor for DeepEos class.
 
         :param vocab: vocabulary
@@ -42,7 +45,6 @@ class DeepEos(torch.nn.Module):  # pylint: disable=too-many-instance-attributes
         self.vocab = vocab
         self.label_vocab = label_vocab
         self.batch_size = batch_size
-        self.use_dropout = use_dropout
         self.hidden_size = hidden_size
         self.embedding_length = embedding_length
         self.output_size = output_size
@@ -50,6 +52,19 @@ class DeepEos(torch.nn.Module):  # pylint: disable=too-many-instance-attributes
         self.embeddings = torch.nn.Embedding(len(self.vocab), self.embedding_length)
         self.lstm = torch.nn.LSTM(self.embedding_length, self.hidden_size)
         self.label = torch.nn.Linear(self.hidden_size, self.output_size)
+
+        self.use_dropout: float = use_dropout
+        self.use_word_dropout: float = use_word_dropout
+        self.use_locked_dropout: float = use_locked_dropout
+
+        if use_dropout > 0.0:
+            self.dropout = torch.nn.Dropout(use_dropout)
+
+        if use_word_dropout > 0.0:
+            self.word_dropout = CharacterDropout(use_word_dropout)
+
+        if use_locked_dropout > 0.0:
+            self.locked_dropout = LockedDropout(use_locked_dropout)
 
         if torch.cuda.is_available():
             self.cuda()
@@ -103,6 +118,8 @@ class DeepEos(torch.nn.Module):  # pylint: disable=too-many-instance-attributes
 
         return model
 
+
+
     def forward(self, input_context, batch_size=None):  # pylint: disable=arguments-differ
         """Define computation performed at every call.
 
@@ -112,6 +129,15 @@ class DeepEos(torch.nn.Module):  # pylint: disable=too-many-instance-attributes
         """
         input_ = self.embeddings(input_context)
         input_ = input_.permute(1, 0, 2)
+
+        if self.use_dropout > 0.0:
+            input_ = self.dropout(input_)
+
+        if self.use_word_dropout > 0.0:
+            input_ = self.word_dropout(input_)
+
+        if self.use_locked_dropout > 0.0:
+            input_ = self.locked_dropout(input_)
 
         batch_size = self.batch_size if batch_size is None else batch_size
 
