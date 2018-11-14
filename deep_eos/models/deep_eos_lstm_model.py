@@ -28,7 +28,7 @@ class DeepEos(torch.nn.Module):  # pylint: disable=too-many-instance-attributes
                  embedding_length: int = 256,
                  output_size: int = 2,
                  use_dropout: float = 0.0,
-                 use_word_dropout: float = 0.05,
+                 use_character_dropout: float = 0.05,
                  use_locked_dropout: float = 0.5):
         """Define constructor for DeepEos class.
 
@@ -54,14 +54,14 @@ class DeepEos(torch.nn.Module):  # pylint: disable=too-many-instance-attributes
         self.label = torch.nn.Linear(self.hidden_size, self.output_size)
 
         self.use_dropout: float = use_dropout
-        self.use_word_dropout: float = use_word_dropout
+        self.use_character_dropout: float = use_character_dropout
         self.use_locked_dropout: float = use_locked_dropout
 
         if use_dropout > 0.0:
             self.dropout = torch.nn.Dropout(use_dropout)
 
-        if use_word_dropout > 0.0:
-            self.word_dropout = CharacterDropout(use_word_dropout)
+        if use_character_dropout > 0.0:
+            self.character_dropout = CharacterDropout(use_character_dropout)
 
         if use_locked_dropout > 0.0:
             self.locked_dropout = LockedDropout(use_locked_dropout)
@@ -133,8 +133,8 @@ class DeepEos(torch.nn.Module):  # pylint: disable=too-many-instance-attributes
         if self.use_dropout > 0.0:
             input_ = self.dropout(input_)
 
-        if self.use_word_dropout > 0.0:
-            input_ = self.word_dropout(input_)
+        if self.use_character_dropout > 0.0:
+            input_ = self.character_dropout(input_)
 
         if self.use_locked_dropout > 0.0:
             input_ = self.locked_dropout(input_)
