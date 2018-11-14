@@ -4,6 +4,8 @@ import sys
 from . import models
 from . import trainers
 
+__version__ = '0.0.3'
+
 logger = logging.getLogger(__name__)
 
 FORMAT = '%(asctime)-15s %(message)s'
