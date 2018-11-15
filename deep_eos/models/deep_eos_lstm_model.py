@@ -39,6 +39,8 @@ class DeepEos(torch.nn.Module):  # pylint: disable=too-many-instance-attributes
         :param embedding_length: embedding size of LSTM
         :param output_size: output size (normally 2: EOS and NON-EOS)
         :param use_dropout: define dropout
+        :param use_character_dropout: define character dropout
+        :param use_locked_dropout: define locked dropout
         """
         super(DeepEos, self).__init__()
 
@@ -117,8 +119,6 @@ class DeepEos(torch.nn.Module):  # pylint: disable=too-many-instance-attributes
         LOG.info('Model successfully loaded from %s', str(model_file))
 
         return model
-
-
 
     def forward(self, input_context, batch_size=None):  # pylint: disable=arguments-differ
         """Define computation performed at every call.
