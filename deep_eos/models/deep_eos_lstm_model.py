@@ -90,6 +90,34 @@ class DeepEos(torch.nn.Module):  # pylint: disable=too-many-instance-attributes
         torch.save(model_state, str(model_file), pickle_protocol=4)
         LOG.info('Model successfully saved to %s', str(model_file))
 
+    def save_checkpoint(self, model_file: Path, optimizer_state: dict, scheduler_state: dict,  # pylint: disable=too-many-arguments # noqa: E501
+                        epoch: int, loss: float):
+        """Save PyTorch model to checkpoint file.
+
+        :param model_file: model filename
+        :param optimizer_state: optimizer state
+        :param scheduler_state: lr scheduler state
+        :param epoch: current epoch
+        :param loss: current loss
+        """
+        model_state = {
+            'state_dict': self.state_dict(),
+            'vocab': self.vocab,
+            'label_vocab': self.label_vocab,
+            'batch_size': self.batch_size,
+            'embeddings': self.embeddings,
+            'hidden_size': self.hidden_size,
+            'embedding_length': self.embedding_length,
+            'output_size': self.output_size,
+            'optimizer_state_dict': optimizer_state,
+            'scheduler_state_dict': scheduler_state,
+            'epoch': epoch,
+            'loss': loss
+        }
+        model_file_name = f'{model_file}-{epoch}.pt'
+        torch.save(model_state, str(model_file_name), pickle_protocol=4)
+        LOG.info('Checkpoint successfully saved to %s', str(model_file_name))
+
     @classmethod
     def load_from_file(cls, model_file: Path):
         """Load model from file.

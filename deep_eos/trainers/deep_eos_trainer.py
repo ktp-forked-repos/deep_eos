@@ -79,7 +79,9 @@ class DeepEosTrainer:
               batch_size: int = 32,
               epochs: int = 10,
               anneal_factor: float = 0.5,
-              patience: int = 3):
+              patience: int = 3,
+              checkpoint: bool = False
+              ):
         """Train model for full epochs.
 
         :param model_file: filename for saving best trained model
@@ -88,7 +90,7 @@ class DeepEosTrainer:
         :param epochs: number of epochs to be trained
         :param anneal_factor: factor by which the learning rate will be reduced
         :param patience: number of epochs with no improvement after which lr will be reduced
-        :return:
+        :param checkpoint: defines if checkpoint file should be written after every epoch
         """
         best_acc = 0.0
 
@@ -161,5 +163,10 @@ class DeepEosTrainer:
                 LOG.info('Save new best model...')
                 self.model.save(model_file)
                 best_acc = val_acc
+
+            if checkpoint:
+                self.model.save_checkpoint(Path('./checkpoint'),
+                                           optim.state_dict(), scheduler.state_dict(),
+                                           epoch + 1, train_loss)
 
             LOG.info('-' * 100)
