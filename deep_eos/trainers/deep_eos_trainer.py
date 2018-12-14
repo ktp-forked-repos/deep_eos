@@ -8,6 +8,7 @@ import numpy as np
 import torch
 import torch.nn.functional as F  # pylint: disable=import-error,no-name-in-module
 from torch.autograd import Variable
+from torch.optim.lr_scheduler import ReduceLROnPlateau
 
 from deep_eos.data import Corpus, Context
 from deep_eos.models.deep_eos_lstm_model import DeepEos
@@ -36,55 +37,6 @@ class DeepEosTrainer:
         params = list(filter(lambda p: p.grad is not None, self.model.parameters()))
         for param in params:
             param.grad.data.clamp_(-clip_value, clip_value)
-
-    def train_model(self, train_iter, batch_size, learning_rate):  # pylint: disable=too-many-locals # noqa: E501
-        """Train model for one epoch.
-
-        :param train_iter: torchtext training iterator
-        :param batch_size: batch size
-        :param learning_rate: desired learning rate for adam optimizer
-        :return:
-        """
-        total_epoch_loss = 0
-        total_epoch_acc = 0
-
-        if torch.cuda.is_available():
-            self.model.cuda()
-        optim = torch.optim.Adam(filter(lambda p: p.requires_grad, self.model.parameters()),
-                                 lr=learning_rate)
-
-        steps = 0
-
-        self.model.train()
-
-        for _, batch in enumerate(train_iter):
-            text = batch.text[0]
-            target = batch.label
-            target = torch.autograd.Variable(target).long()  # pylint: disable=no-member
-            if torch.cuda.is_available():
-                text = text.cuda()
-                target = target.cuda()
-
-            if text.size()[0] is not batch_size:
-                continue
-
-            optim.zero_grad()
-
-            prediction = self.model(text)
-
-            loss = self.loss_fn(prediction, target)
-
-            num_corrects = (torch.max(prediction, 1)[1].view(  # pylint: disable=no-member # noqa: E501
-                target.size()).data == target.data).float().sum()
-            acc = num_corrects / len(batch)
-            loss.backward()
-            self.clip_gradient(1e-1)
-            optim.step()
-            steps += 1
-            total_epoch_loss += loss.item()
-            total_epoch_acc += acc.item()
-
-        return total_epoch_loss / len(train_iter), total_epoch_acc / len(train_iter)
 
     def evaluate_dev_set(self, contexts: List[Context]):
         """Evaluate model on development set.
@@ -122,30 +74,88 @@ class DeepEosTrainer:
 
         return correct / counter
 
-    def train(self, model_file: Path,
+    def train(self, model_file: Path,  # pylint: disable=too-many-arguments,too-many-locals
               learning_rate: float = 0.001,
               batch_size: int = 32,
-              epochs: int = 10):
+              epochs: int = 10,
+              anneal_factor: float = 0.5,
+              patience: int = 3):
         """Train model for full epochs.
 
         :param model_file: filename for saving best trained model
         :param learning_rate: learning rate for adam optimizer
         :param batch_size: batch size
         :param epochs: number of epochs to be trained
+        :param anneal_factor: factor by which the learning rate will be reduced
+        :param patience: number of epochs with no improvement after which lr will be reduced
         :return:
         """
         best_acc = 0.0
 
         LOG.info('Start training for %s epochs', epochs)
 
+        if torch.cuda.is_available():
+            self.model.cuda()
+
+        optim = torch.optim.Adam(filter(lambda p: p.requires_grad, self.model.parameters()),
+                                 lr=learning_rate)
+
+        anneal_mode = 'max'
+        scheduler = ReduceLROnPlateau(optim, factor=anneal_factor, patience=patience,
+                                      mode=anneal_mode, verbose=True)
+
         for epoch in range(epochs):
-            train_loss, train_acc = self.train_model(train_iter=self.corpus.train_iter,
-                                                     batch_size=batch_size,
-                                                     learning_rate=learning_rate)
+            total_epoch_loss = 0
+            total_epoch_acc = 0
+
+            for group in optim.param_groups:
+                learning_rate = group['lr']
+
+            steps = 0
+
+            if learning_rate < 0.0001:
+                logging.info("Learning rate too small - exiting training!")
+                break
+
+            self.model.train()
+
+            for _, batch in enumerate(self.corpus.train_iter):
+                text = batch.text[0]
+                target = batch.label
+                target = torch.autograd.Variable(target).long()  # pylint: disable=no-member
+                if torch.cuda.is_available():
+                    text = text.cuda()
+                    target = target.cuda()
+
+                if text.size()[0] is not batch_size:
+                    continue
+
+                optim.zero_grad()
+
+                prediction = self.model(text)
+
+                loss = self.loss_fn(prediction, target)
+
+                num_corrects = (torch.max(prediction, 1)[1].view(  # pylint: disable=no-member # noqa: E501
+                    target.size()).data == target.data).float().sum()
+                acc = num_corrects / len(batch)
+                loss.backward()
+                self.clip_gradient(1e-1)
+                optim.step()
+                steps += 1
+                total_epoch_loss += loss.item()
+                total_epoch_acc += acc.item()
+
+            train_loss = total_epoch_loss / len(self.corpus.train_iter)
+            train_acc = total_epoch_acc / len(self.corpus.train_iter)
+
             val_acc = self.evaluate_dev_set(self.corpus.dev_contexts)
 
-            LOG.info('Epoch: %s, Train Loss: %s, Train Acc: %s, Val. Acc: %s',
-                     epoch + 1, round(train_loss, 4), round(train_acc, 4), round(val_acc, 4))
+            scheduler.step(val_acc)
+
+            LOG.info('Epoch: %s, Train Loss: %s, Train Acc: %s, Val. Acc: %s, Learning Rate: %s',
+                     epoch + 1, round(train_loss, 4), round(train_acc, 4), round(val_acc, 4),
+                     learning_rate)
 
             if val_acc > best_acc:
                 LOG.info('Save new best model...')
