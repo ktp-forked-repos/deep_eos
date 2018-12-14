@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='deep-eos',
-    version='0.0.2.post1',
+    version='0.0.3',
     description='Deep end-of-sentence detection',
     long_description=open("README.md", encoding='utf-8').read(),
     long_description_content_type="text/markdown",
@@ -17,9 +17,9 @@ setup(
         'Click==7.0',
         'idna==2.7',
         'numpy==1.15.4',
-        'requests==2.20.1',
+        'requests==2.21.0',
         'toml==0.10.0',
-        'torch==0.4.1',
+        'torch==1.0.0',
         'torchtext==0.3.1',
         'tqdm==4.28.1',
         'urllib3==1.24.1',
