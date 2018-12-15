@@ -75,7 +75,6 @@ class DeepEos(torch.nn.Module):  # pylint: disable=too-many-instance-attributes
         """Save PyTorch model to file.
 
         :param model_file: model filename
-        :return:
         """
         model_state = {
             'state_dict': self.state_dict(),
@@ -123,7 +122,7 @@ class DeepEos(torch.nn.Module):  # pylint: disable=too-many-instance-attributes
         """Load model from file.
 
         :param model_file: model filename to be loaded
-        :return:
+        :return: model
         """
         state = torch.load(model_file, map_location={'cuda:0': 'cpu'})
 
@@ -153,7 +152,7 @@ class DeepEos(torch.nn.Module):  # pylint: disable=too-many-instance-attributes
 
         :param input_context: context for potential end-of-sentence
         :param batch_size: batch size
-        :return:
+        :return: final output for forward pass
         """
         input_ = self.embeddings(input_context)
         input_ = input_.permute(1, 0, 2)
@@ -188,7 +187,6 @@ class DeepEos(torch.nn.Module):  # pylint: disable=too-many-instance-attributes
         :param left_ws: left window size (context before eos marker)
         :param right_ws: right window size (context after eos marker)
         :param eos_marker: eos marker (like </eos>) used for highlighting an end-of-sentence
-        :return:
         """
         contexts = get_char_context(left_window=left_ws,
                                     right_window=right_ws,

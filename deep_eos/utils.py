@@ -17,7 +17,7 @@ def get_char_context(left_window, right_window, buffer):
     :param left_window: left window size
     :param right_window: right window size
     :param buffer: text buffer
-    :return:
+    :return: context generator
     """
     for position, char in enumerate(buffer):
         if char in EOS_CHARS and position + 1 < len(buffer) and buffer[position + 1] in SEPS:
@@ -50,7 +50,7 @@ def parse_dataset_to_buffer(filename):
     """Parse dataset to string buffer.
 
     :param filename: filename to be read
-    :return:
+    :return: list of sentences
     """
     sentences = []
     with open(filename, 'rt') as f_p:

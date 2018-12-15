@@ -16,6 +16,7 @@ def test_get_char_context():
     assert contexts[3].context == "tr.▁1"
     assert contexts[4].context == "14.▁▁"  # Right padding is ok?
 
+
 def test_calculate_evaluation_metrics():
     #sentence = "Dr. Prof. Müller geht zur Universität an der Str. 14.\n"
 

@@ -83,6 +83,11 @@ class Corpus:  # pylint: disable=too-few-public-methods,too-many-instance-attrib
 
     @staticmethod
     def _write_csv(contexts: List[Context], filename: str):
+        """Write contexts to csv file.
+
+        :param contexts: list of contexts
+        :param filename: filename for csv file
+        """
         with open(filename, 'wt') as f_p:
             for context in contexts:
                 context_str = context.context

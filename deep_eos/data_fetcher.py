@@ -29,7 +29,7 @@ class EOSContextFetcher:  # pylint: disable=too-few-public-methods
         :param base_path: path to dataset
         :param left_ws: left window size
         :param right_ws: right window size
-        :return:
+        :return: contexts
         """
         contexts: List[Context]
         if task == Task.UD_UNTOK:
