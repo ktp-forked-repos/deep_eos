@@ -37,6 +37,8 @@ def get_char_context(left_window, right_window, buffer):
 
             context_str = context_str.replace('\n', ' ')
 
+            context_str = context_str.replace(' ', '▁')
+
             context = Context(context=context_str,
                               label=int(label),
                               position=position)
