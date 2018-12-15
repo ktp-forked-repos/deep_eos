@@ -51,7 +51,8 @@ class Corpus:  # pylint: disable=too-few-public-methods,too-many-instance-attrib
                                          include_lengths=True,
                                          fix_length=fix_length,
                                          tokenize=list,
-                                         sequential=True)
+                                         sequential=True,
+                                         pad_token='▁')
         self.label_fields = data.LabelField(sequential=False)
 
         self.train_, self.dev_, self.test_ = data.TabularDataset.splits(
