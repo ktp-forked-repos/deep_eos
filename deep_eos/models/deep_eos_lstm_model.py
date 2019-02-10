@@ -197,7 +197,7 @@ class DeepEos(torch.nn.Module):  # pylint: disable=too-many-instance-attributes
 
         return final_output
 
-    def predict(self, buffer: str, left_ws: int, right_ws: int, eos_marker='</eos>', io_stream=sys.stdout):  # pylint: disable=too-many-locals # noqa: E501
+    def predict(self, buffer: str, left_ws: int = 4, right_ws: int = 4, eos_marker='</eos>', io_stream=sys.stdout):  # pylint: disable=too-many-locals # noqa: E501
         """Predict and eos tag input buffer.
 
         :param buffer: text buffer
