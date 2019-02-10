@@ -64,13 +64,52 @@ entropy model for sentence boundary detection. To test the robustness of our
 model, we use the *Universal Dependencies* for several languages as
 datasets.
 
-# Datasets
+# Usage and supported languages
+
+A preprained model on Universal Dependencies for German is currently available. Other languages
+will be supported in near future.
+
+## Models
+
+The following table lists the available pretrained models and some training information like
+used dataset or left and right context size.
+
+| Language | Training corpus        | Dev F-Score | Test F-Score | Model file                   | Left ws | Right ws
+| -------- | ---------------------- | ----------- | ------------ | ---------------------------- | ------- | --------
+| German   | Universal Dependencies | 0.9897      | 0.9816       | `best_ud_german_model-v1.pt` | *4*     | *4*
+
+## Example
+
+Here's an example to perform end-of-sentence detection with this library:
+
+```python
+from deep_eos.models.deep_eos_lstm_model import DeepEos
+
+# Download pretrained model
+deep_eos: DeepEos = DeepEos.load_from_cloud(language='de')
+
+buffer = "Heute ist ein schöner Tag in München. Herr Prof. Dr. Müller arbeitet dort."
+
+deep_eos.predict(buffer=buffer)
+```
+
+The following eos-tagged text will be returned:
+
+```text
+Heute ist ein schöner Tag in München.</eos> Herr Prof. Dr. Müller arbeitet dort.</eos>
+```
+
+# Training an own model
+
+This sections shows how to train an own model.
+
+## Datasets
 
 At the moment, training, prediction and evaluation is supported on the
 *Universal Dependencies* (<http://universaldependencies.org/>) datasets, as well as for plain-text
 datasets (one sentence per line).
 
-## *Universal Dependencies*
+### *Universal Dependencies*
 
 *Universal Dependencies* in version 2.2 can be downloaded with the following command (you should not
 place these files in the `deep-eos` repository folder):
@@ -81,16 +120,16 @@ curl --remote-name-all "https://lindat.mff.cuni.cz/repository/xmlui/bitstream/ha
 tar -xzf ud-treebanks-v2.2.tgz
 ```
 
-# Configuration
+## Configuration
 
 *deep-eos* uses a configuration-based commandline interface for training, prediction and evaluation. 
 That means, all parameters are specified in a *toml* configuration file. This heavily reduces the 
 amount of commandline arguments. The only commandline option is the path to the *toml* configuration
 file.
 
-## *toml* configuration
+### *toml* configuration
 
-### *Universal Dependencies* datasets
+#### *Universal Dependencies* datasets
 
 A typical configurations for a *Universal Dependencies* dataset looks like:
 
@@ -121,7 +160,7 @@ test_tagged_file = "ud_german_test_tagged.txt"
 eos_marker = "</eos>"
 ```
 
-### Plain-text datasets
+#### Plain-text datasets
 
 It is also possible to use plain-text datasets for training, development and testing. Then you
 have to specify *one* sentence per line. In the *toml* configuration you have to specifiy a
