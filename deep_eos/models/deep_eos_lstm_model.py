@@ -12,6 +12,7 @@ from torchtext.vocab import Vocab
 
 from deep_eos.dropout import CharacterDropout, LockedDropout
 from deep_eos.utils import EOS_CHARS
+from deep_eos.utils import cached_path
 from deep_eos.utils import get_char_context
 
 LOG = logging.getLogger(__name__)
@@ -146,6 +147,19 @@ class DeepEos(torch.nn.Module):  # pylint: disable=too-many-instance-attributes
         LOG.info('Model successfully loaded from %s', str(model_file))
 
         return model
+
+    @classmethod
+    def load_from_cloud(cls, language: str):
+        """Download model from cloud and returns it.
+
+        :param language: language code for model
+        :return: model
+        """
+        cache_dir = Path('models')
+
+        if language in ('de', 'ud-german', 'german'):
+            base_path = 'https://schweter.eu/cloud/deep_eos/models/best_ud_german_model-v1.pt'
+            return cls.load_from_file(cached_path(base_path, cache_dir))
 
     def forward(self, input_context, batch_size=None):  # pylint: disable=arguments-differ
         """Define computation performed at every call.
