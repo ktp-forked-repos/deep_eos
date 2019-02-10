@@ -3,7 +3,7 @@
 import logging
 import sys
 from pathlib import Path
-from typing import Set
+from typing import Set, Union
 
 import numpy as np
 import torch
@@ -11,8 +11,8 @@ from torch.autograd import Variable
 from torchtext.vocab import Vocab
 
 from deep_eos.dropout import CharacterDropout, LockedDropout
+from deep_eos.file_utils import get_cached_path
 from deep_eos.utils import EOS_CHARS
-from deep_eos.utils import cached_path
 from deep_eos.utils import get_char_context
 
 LOG = logging.getLogger(__name__)
@@ -119,7 +119,7 @@ class DeepEos(torch.nn.Module):  # pylint: disable=too-many-instance-attributes
         LOG.info('Checkpoint successfully saved to %s', str(model_file_name))
 
     @classmethod
-    def load_from_file(cls, model_file: Path):
+    def load_from_file(cls, model_file: Path) -> "DeepEos":
         """Load model from file.
 
         :param model_file: model filename to be loaded
@@ -149,17 +149,20 @@ class DeepEos(torch.nn.Module):  # pylint: disable=too-many-instance-attributes
         return model
 
     @classmethod
-    def load_from_cloud(cls, language: str):
+    def load_from_cloud(cls, language: str) -> Union[None, "DeepEos"]:
         """Download model from cloud and returns it.
 
         :param language: language code for model
         :return: model
         """
-        cache_dir = Path('models')
+        model_path = get_cached_path(language=language)
 
-        if language in ('de', 'ud-german', 'german'):
-            base_path = 'https://schweter.eu/cloud/deep_eos/models/best_ud_german_model-v1.pt'
-            return cls.load_from_file(cached_path(base_path, cache_dir))
+        model = None
+
+        if model_path:
+            model = cls.load_from_file(model_path)
+
+        return model
 
     def forward(self, input_context, batch_size=None):  # pylint: disable=arguments-differ
         """Define computation performed at every call.
