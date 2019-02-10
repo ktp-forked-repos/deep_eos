@@ -3,7 +3,7 @@
 import logging
 import sys
 from pathlib import Path
-from typing import Set
+from typing import Set, Union
 
 import numpy as np
 import torch
@@ -11,6 +11,7 @@ from torch.autograd import Variable
 from torchtext.vocab import Vocab
 
 from deep_eos.dropout import CharacterDropout, LockedDropout
+from deep_eos.file_utils import get_cached_path
 from deep_eos.utils import EOS_CHARS
 from deep_eos.utils import get_char_context
 
@@ -118,7 +119,7 @@ class DeepEos(torch.nn.Module):  # pylint: disable=too-many-instance-attributes
         LOG.info('Checkpoint successfully saved to %s', str(model_file_name))
 
     @classmethod
-    def load_from_file(cls, model_file: Path):
+    def load_from_file(cls, model_file: Path) -> "DeepEos":
         """Load model from file.
 
         :param model_file: model filename to be loaded
@@ -144,6 +145,22 @@ class DeepEos(torch.nn.Module):  # pylint: disable=too-many-instance-attributes
             model = model.cuda()
 
         LOG.info('Model successfully loaded from %s', str(model_file))
+
+        return model
+
+    @classmethod
+    def load_from_cloud(cls, language: str) -> Union[None, "DeepEos"]:
+        """Download model from cloud and returns it.
+
+        :param language: language code for model
+        :return: model
+        """
+        model_path = get_cached_path(language=language)
+
+        model = None
+
+        if model_path:
+            model = cls.load_from_file(model_path)
 
         return model
 
@@ -180,7 +197,7 @@ class DeepEos(torch.nn.Module):  # pylint: disable=too-many-instance-attributes
 
         return final_output
 
-    def predict(self, buffer: str, left_ws: int, right_ws: int, eos_marker='</eos>', io_stream=sys.stdout):  # pylint: disable=too-many-locals # noqa: E501
+    def predict(self, buffer: str, left_ws: int = 4, right_ws: int = 4, eos_marker='</eos>', io_stream=sys.stdout):  # pylint: disable=too-many-locals # noqa: E501
         """Predict and eos tag input buffer.
 
         :param buffer: text buffer
